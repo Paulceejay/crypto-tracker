@@ -20,5 +20,13 @@ export default function RootLayout() {
             presentation: "card",
           }}
         />
+
+<Stack.Screen
+          name="coins"
+          options={{
+            headerShown: false,
+            presentation: "card",
+          }}
+        />
   </Stack>;
 }

@@ -1,8 +1,10 @@
 import { Text, TouchableOpacity, View } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
-import LogoComponent from "./components/LogoComponent";
+import LogoComponent from "../components/LogoComponent";
+import { useRouter } from "expo-router";
 
 export default function Index() {
+  const router = useRouter()
   return (
     <View
      className="flex-1 justify-center items-center bg-background px-6 relative"
@@ -22,7 +24,7 @@ export default function Index() {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
       >
-        <TouchableOpacity className="py-5 w-full">
+        <TouchableOpacity onPress={() => router.push("/coins")} className="py-5 w-full">
           <Text className="text-white text-center text-base font-semibold font-GroteskBold">
             Get Started
           </Text>
