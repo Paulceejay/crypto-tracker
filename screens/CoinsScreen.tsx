@@ -1,34 +1,45 @@
-import { View, Text, FlatList, Image } from "react-native";
+import { View, Text, FlatList, Image, ActivityIndicator } from "react-native";
 import { useEffect, useState } from "react";
 import { getAllCoins } from "@/api/getAllCoins";
 import CoinsItemComponent from "@/components/CoinsItemComponent";
+import { useQuery } from "@tanstack/react-query";
+import LoadingComponent from "@/components/LoadingComponent";
 
+let icon = "" 
 const CoinsScreen = () => {
-  const [coins, setCoins] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { data, error, isLoading } = useQuery({
+    queryKey: ["coins"],
+    queryFn: getAllCoins,
+  });
 
-  useEffect(() => {
-    const allcoins = async () => {
-      const coindatas = await getAllCoins();
-      
-      setCoins(coindatas.coins);
-    };
-
-    allcoins();
-  }, [coins]);
-
+  if (isLoading) {
+    return (
+      <LoadingComponent />
+    );
+  }
+ 
   return (
-    <View>
+    <View className="overflow-hidden">
       <FlatList
-        className=""
-        data={coins}
+        className="gap-3"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{gap: 15}}
+        data={data?.coins}
         keyExtractor={(item) => item.uuid}
         renderItem={({ item }) => (
-          <CoinsItemComponent rank={item.rank} src={item.iconUrl} name={item.name} symbol={item.symbol} price={parseFloat(item.price).toFixed(2)} change={parseFloat(item.change).toFixed(2)} />
+          <CoinsItemComponent
+            rank={item.rank}
+            src={item.iconUrl}
+            name={item.name}
+            symbol={item.symbol}
+            price={item.price}
+            change={item.change}
+            uuid={item.uuid}
+          />
         )}
       />
     </View>
-  )
-}
+  );
+};
 
-export default CoinsScreen
+export default CoinsScreen;

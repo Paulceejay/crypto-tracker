@@ -1,20 +1,29 @@
-import { View, Text, Image  } from 'react-native'
+import { View, Text, Image, TouchableOpacity, Pressable } from 'react-native'
 import React from 'react'
+import CoinChangeText from './CoinChangeText';
+import { useRouter } from 'expo-router';
 
-type iconItems = {
-  rank: Number
+type coinProps = {
+  rank: Number | any
   src: String
   name: String
   symbol: String
   price: Number | String
   change: Number | String
+  uuid: Number | String
 }
 
-const CoinsItemComponent = ({rank, src, name, symbol, price, change }: any ) => {
+const CoinsItemComponent = ({rank, src, name, symbol, price, change, uuid }: coinProps) => {
+  const router = useRouter()
+
+  const icon = src?.endsWith('.svg')
+  ? src.replace('.svg', '.png')
+  : src;
+
   return (
-    <View className='flex-row bg-white shadow-lg shadow-text my-2 px-2 h-20 rounded-lg'>
+    <TouchableOpacity onPress={() => router.push(`/${uuid}`)} className='flex-row bg-white shadow-lg shadow-text px-3 h-20 rounded-lg'>
       <Text className='flex justify-self-center self-center text-text text-sm font-Grotesk font-normal'>{rank}</Text>
-      <Image source={{ uri: src }} className="w-8 h-8 mx-2 flex justify-self-center self-center rounded-full" />
+      <Image resizeMode='cover' source={{ uri: icon}} className="w-10 h-10 mx-2 flex justify-self-center self-center rounded-full" />
 
       <View className='flex-1 flex-row justify-between'>
         <View className='flex justify-self-center self-center'>
@@ -25,11 +34,12 @@ const CoinsItemComponent = ({rank, src, name, symbol, price, change }: any ) => 
         </View>
 
         <View className='flex justify-self-center self-center'>
-        <Text className="text-base text-title font-GroteskBold font-bold">{price}</Text>
-        <Text className="text-green-400 font-bold text-sm">{change}</Text>
+        <Text className="text-base text-title font-GroteskBold font-bold">{parseFloat(price).toFixed(2)} $</Text>
+      
+        <CoinChangeText value={change} className='font-bold text-sm text-center'/>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   )
 }
 
