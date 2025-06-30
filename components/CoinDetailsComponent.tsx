@@ -46,7 +46,7 @@ const CoinDetailsComponent = ({rank, src, name, symbol, price, change, marketCap
     <CoinChangeText value={(change)} />
 </View>
 
-<Image resizeMode='cover' source={{ uri: icon}} className="w-20 h-20 mx-2 flex justify-self-center self-center rounded-full" />
+<Image resizeMode='cover' source={{ uri: icon}} className="w-20 h-20 mx-2 mt-2 flex justify-self-center self-center rounded-full" />
 </View>
 
 {/* coin chart */}
