@@ -1,15 +1,35 @@
 import { View, Text, FlatList, Image, ActivityIndicator } from "react-native";
-import { useEffect, useState } from "react";
-import { getAllCoins } from "@/api/getAllCoins";
-import CoinsItemComponent from "@/components/CoinsItemComponent";
+import { useEffect, useState, useCallback } from "react";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import debounce from "lodash.debounce";
+import CoinsItemComponent from "@/components/CoinsItemComponent";
 import LoadingComponent from "@/components/LoadingComponent";
+import SearchComponent from "@/components/SearchComponent";
+import { getAllCoins } from "@/api/getAllCoins";
+import { searchCoin } from "@/api/searchCoin";
 
 const CoinsScreen = () => {
+  const [searchInput, setSearchInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Debounce the search text input
+  const debouncedSearch = useCallback(
+    debounce((text: string) => {
+      setSearchQuery(text);
+    }, 500),
+    []
+  );
+
+  const handleChange = (text: string) => {
+    setSearchInput(text);
+    debouncedSearch(text);
+  };
+
+  // coins data to display for the user immediately after loading
   const {
-    data,
-    error,
-    isLoading,
+    data: getAllCoinsData,
+    error: allCoinsError,
+    isLoading: allCoinIsLoading,
     fetchNextPage,
     isFetchingNextPage,
     hasNextPage,
@@ -18,19 +38,37 @@ const CoinsScreen = () => {
     queryFn: getAllCoins,
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage.nextOffset,
-    refetchInterval: 200, // to simply update my coins price changes evry 2s
+    refetchInterval: 1000, // to simply update my coins price changes evry 1 second
     refetchOnMount: true,
   });
 
-  if (isLoading) {
+  // coins data for when a user is searching
+  const {
+    data: searchData,
+    error: searchError,
+    isLoading: searchIsLoading,
+  } = useQuery({
+    queryKey: ["search", searchQuery],
+    queryFn: () => searchCoin(searchQuery),
+    enabled: !!searchQuery,
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+  });
+
+  const isSearching = !!searchQuery;
+  // coins data
+  const coins = isSearching
+    ? searchData
+    : getAllCoinsData?.pages.flatMap((page) => page.coins);
+
+  if (allCoinIsLoading) {
     return <LoadingComponent />;
   }
-  // coins data
-  const coins = data?.pages.flatMap((page) => page.coins);
 
   return (
-    <View className="overflow-hidden">
-      <FlatList
+    <View className="overflow-hidden pb-14">
+      <SearchComponent value={searchInput} onChangeText={handleChange} />
+      <FlatList // Flatlist to display default coins and also while searching
         className="gap-3"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ gap: 15 }}
@@ -38,13 +76,13 @@ const CoinsScreen = () => {
         keyExtractor={(item) => item.uuid + item.name}
         renderItem={({ item }) => (
           <CoinsItemComponent
-            rank={item.rank}
-            src={item.iconUrl}
             name={item.name}
             symbol={item.symbol}
+            rank={item.rank}
+            src={item.iconUrl}
             price={item.price}
             change={item.change}
-            uuid={item.uuid}
+            uuid={item.uiuid}
           />
         )}
         onEndReached={() => {
@@ -58,6 +96,15 @@ const CoinsScreen = () => {
             <ActivityIndicator color={"#A288FD"} className="my-4" />
           ) : null
         }
+        // ListEmptyComponent={
+        //   searchIsLoading ? (
+        //     <ActivityIndicator color={"#A288FD"} className="my-4" />
+        //   ) : (
+        //     <Text className="text-center text-gray-400 mt-8">
+        //       No results found try using minimum of 3 characters.
+        //     </Text>
+        //   )
+        // }
       />
     </View>
   );

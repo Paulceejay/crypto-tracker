@@ -14,11 +14,12 @@ const CoinChangeText = ({ value, className = '' }: Props)=> {
     ? 'text-dangerColor'
     : 'text-text';
 
+    const hasValidChange = !isNaN(value);
 const formatted = `${value > 0 ? '+' : ''}${parseFloat(value).toFixed(2)} %`;
 
 return (
   <Text className={`${color} ${className}`}>
-    {formatted}
+    {hasValidChange ? formatted : ""}
   </Text>
 );}
 
