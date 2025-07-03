@@ -7,8 +7,13 @@ import LoadingComponent from "@/components/LoadingComponent";
 import SearchComponent from "@/components/SearchComponent";
 import { getAllCoins } from "@/api/getAllCoins";
 import { searchCoin } from "@/api/searchCoin";
+import CurrencySelector from "@/components/CurrencySelector";
+import { CURRENCIES } from "@/constants/coinsContants";
+import PriceHeader from "@/components/PriceHeader";
 
 const CoinsScreen = () => {
+  // const [currency, setCurrency] = useState(CURRENCIES[0].uuid);
+
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -56,10 +61,15 @@ const CoinsScreen = () => {
   });
 
   const isSearching = !!searchQuery;
-  // coins data
+  // coins data switching data when searching and when not searching
   const coins = isSearching
     ? searchData
     : getAllCoinsData?.pages.flatMap((page) => page.coins);
+
+  //   // demo
+  // const currentPrice = coins && coins.length > 0 
+  // ? coins[coins.length - 1].price 
+  // : '0';
 
   if (allCoinIsLoading) {
     return <LoadingComponent />;
@@ -68,6 +78,11 @@ const CoinsScreen = () => {
   return (
     <View className="overflow-hidden pb-14">
       <SearchComponent value={searchInput} onChangeText={handleChange} />
+      {/* <PriceHeader 
+          price={currentPrice} 
+          currency={currency}
+          onCurrencyChange={setCurrency} 
+        /> */}
       <FlatList // Flatlist to display default coins and also while searching
         className="gap-3"
         showsVerticalScrollIndicator={false}
@@ -82,7 +97,7 @@ const CoinsScreen = () => {
             src={item.iconUrl}
             price={item.price}
             change={item.change}
-            uuid={item.uiuid}
+            uuid={item.uuid}
           />
         )}
         onEndReached={() => {
@@ -96,15 +111,15 @@ const CoinsScreen = () => {
             <ActivityIndicator color={"#A288FD"} className="my-4" />
           ) : null
         }
-        // ListEmptyComponent={
-        //   searchIsLoading ? (
-        //     <ActivityIndicator color={"#A288FD"} className="my-4" />
-        //   ) : (
-        //     <Text className="text-center text-gray-400 mt-8">
-        //       No results found try using minimum of 3 characters.
-        //     </Text>
-        //   )
-        // }
+        ListEmptyComponent={
+          searchIsLoading ? (
+            <ActivityIndicator color={"#A288FD"} className="my-4" />
+          ) : (
+            <Text className="text-center text-gray-400 mt-8">
+              No results found try using minimum of 3 characters.
+            </Text>
+          )
+        }
       />
     </View>
   );

@@ -7,7 +7,9 @@ import LoadingComponent from "@/components/LoadingComponent";
 import CoinDetailsComponent from "@/components/CoinDetailsComponent";
 
 const CoinDetailsScreen = () => {
+ 
   const { uuid } = useLocalSearchParams();
+
   const { data, error, isLoading } = useQuery({
     queryKey: ["coins", uuid],
     queryFn: () => getCoinDetails(uuid),
@@ -16,6 +18,7 @@ const CoinDetailsScreen = () => {
   if(isLoading){
     return <LoadingComponent />
   }
+  // console.log(historyData)
   return (
     <View>
         <CoinDetailsComponent
@@ -25,8 +28,10 @@ const CoinDetailsScreen = () => {
         change={data?.change}
         price={data?.price}
         marketCap={data?.marketCap}
-        volume={data?.Volume}
+        volume={data?.['24hVolume']}
         rank={data?.rank}
+        allTimeHigh={data?.allTimeHigh.price}
+        uuid={data?.uuid}
       />
     </View>
   )
