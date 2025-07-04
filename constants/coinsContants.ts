@@ -7,14 +7,13 @@ export const CURRENCIES = [
     { uuid: 'dvUf0i0J5s8R', symbol: 'ETH', name: 'Ethereum' },
   ];
 
- export const TIME_PERIODS = [
+ export const timePeriods = [
   { id: '1h', label: '1H' },
     { id: '24h', label: '24H' },
     { id: '7d', label: '7D' },
     { id: '1m', label: '1M' },
     { id: '3m', label: '3M' },
     { id: '1y', label: '1Y' },
-    { id: '5y', label: '5Y' },
   ];
 
   export interface HistoryPoint {

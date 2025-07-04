@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Image } from "react-native";
-import React, {useState} from "react";
+import React from "react";
 import Feather from "@expo/vector-icons/Feather";
 import CoinChangeText from "./CoinChangeText";
 import MarketStatsComponent from "./MarketStatsComponent";
@@ -30,19 +30,9 @@ const CoinDetailsComponent = ({
   allTimeHigh,
   uuid,
 }: any) => {
-  //  const [timePeriod, setTimePeriod] = useState('24h');
   const router = useRouter();
 
   const icon = src?.endsWith(".svg") ? src.replace(".svg", ".png") : src;
-
-  // const { data: historyData, isLoading: historyLoading } = useQuery({
-  //   queryKey: ['coin-history', uuid, timePeriod],
-  //   queryFn: () => getCoinHistory(uuid, timePeriod),
-  //   refetchInterval: 1000,
-  //   refetchOnWindowFocus: false,
-  //   staleTime: 10000, // Consider data stale after 10 seconds
-  //   retry: 3,
-  // });
 
   return (
     <View className="mt-5">
@@ -69,7 +59,7 @@ const CoinDetailsComponent = ({
             {name} price
           </Text>
           <Text className="text-lg text-title font-GroteskBold font-bold my-1">
-            ${parseFloat(price).toFixed(0)}
+            ${parseFloat(price).toFixed(2)}
           </Text>
           <CoinChangeText value={change} />
         </View>
@@ -82,7 +72,7 @@ const CoinDetailsComponent = ({
       </View>
 
       {/* coin chart */}
-      <View className="bg-white rounded-md h-72">
+      <View className="bg-white rounded-lg p-2">
        <CoinChart name={name} uuid={uuid} /> 
       </View>
 

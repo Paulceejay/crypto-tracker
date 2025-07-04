@@ -1,7 +1,9 @@
 import React from 'react';
-import { ScrollView, Text, StyleSheet } from 'react-native';
+import { ScrollView, Text, Dimensions } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { TIME_PERIODS } from '@/constants/coinsContants';
+import { timePeriods } from '@/constants/coinsContants';
+
+const { width } = Dimensions.get('window');
 
 interface TimePeriodSelectorProps {
     period: string;
@@ -13,49 +15,30 @@ const TimePeriodSelector = ({ period, onPeriodChange }: TimePeriodSelectorProps)
     <ScrollView 
     horizontal 
     showsHorizontalScrollIndicator={false}
-    contentContainerStyle={styles.container}
+    scrollEnabled={false}
+    contentContainerStyle={{marginBottom: 20, paddingHorizontal: 8}}
+    className='w-full'
   >
-    {TIME_PERIODS.map((timePeriod) => (
+    {timePeriods.map((time) => (
       <Animated.View 
-        key={timePeriod.id}
+        key={time.id}
         entering={FadeIn.duration(300)}
         exiting={FadeOut.duration(200)}
       >
-        <Text
-          style={[
-            styles.button,
-            period === timePeriod.id && styles.activeButton
-          ]}
-          onPress={() => onPeriodChange(timePeriod.id)}
+        <Text     
+         className={`text-base font-medium rounded-full font-Grotesk mx-1 py-2 px-4 ${
+          period === time.id 
+            ? "bg-title text-white" 
+            : "bg-transparent text-text"
+        }`}
+          onPress={() => onPeriodChange(time.id)}
         >
-          {timePeriod.label}
+          {time.label}
         </Text>
       </Animated.View>
     ))}
   </ScrollView>
   )
 }
-
-const styles = StyleSheet.create({
-    container: {
-      flexDirection: 'row',
-      marginBottom: 20,
-      paddingHorizontal: 8,
-    },
-    button: {
-      paddingHorizontal: 16,
-      paddingVertical: 8,
-      marginHorizontal: 4,
-      borderRadius: 20,
-      backgroundColor: '#f0f0f0',
-      color: '#666',
-      fontSize: 14,
-      fontWeight: '500',
-    },
-    activeButton: {
-      backgroundColor: '#007AFF',
-      color: 'white',
-    },
-  });
 
 export default TimePeriodSelector
