@@ -24,7 +24,7 @@ export default function Index() {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
       >
-        <TouchableOpacity onPress={() => router.push("/coins")} className="py-5 w-full">
+        <TouchableOpacity onPress={() => router.replace("/coins")} className="py-5 w-full">
           <Text className="text-white text-center text-base font-semibold font-GroteskBold">
             Get Started
           </Text>

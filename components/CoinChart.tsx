@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import { getCoinHistory } from "@/api/getCoinDetails";
 import { CartesianChart, Line, useChartPressState } from "victory-native";
@@ -12,36 +12,16 @@ const CoinChart = ({ uuid, name }: any) => {
   const [timePeriod, setTimePeriod] = useState("24h");
   
   const grotesk = require("../assets/fonts/SpaceGrotesk-Regular.ttf");
-
   const font = useFont(grotesk, 12);
 
-  const value = useDerivedValue(() => {
-    return "$" + state.y.highTmp.value.value.toFixed(2)
-  },[state])
-
-
-  const { data: historyData, isLoading: historyLoading } = useQuery({
+  const { data: historyData, isLoading: historyLoading, error:historyError, refetch: historyRefectch } = useQuery({
     queryKey: ["coin-history", uuid, timePeriod],
     queryFn: () => getCoinHistory(uuid, timePeriod),
     refetchInterval: 1000,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
     staleTime: 10000,
     retry: 3,
   });
-
-  // Format price for display
-  const formatPrice = (label: unknown) => {
-    const price = Number(label);
-    if (isNaN(price)) return "";
-
-    if (price >= 1000) {
-      return `$${(price / 1000).toFixed(1)}K`;
-    } else if (price >= 1) {
-      return `$${price.toFixed(2)}`;
-    } else {
-      return `$${price.toFixed(4)}`;
-    }
-  };
 
    // Calculate if price is trending up or down
 let isPositive = false;
@@ -76,11 +56,25 @@ if (historyData?.length >= 2) {
     }
   };
 
-  if (historyLoading || !historyData || historyData.length === 0) {
+  if (historyLoading) {
     return (
-      <Text className="flex justify-self-center self-center text-title text-base font-normal font-Grotesk">
+     <View className="flex justify-center items-center h-28">
+      <TimePeriodSelector period={timePeriod} onPeriodChange={setTimePeriod} />
+       <Text className="text-title text-base font-normal font-Grotesk">
         Loading {name} charts
       </Text>
+     </View>
+    );
+  }
+
+  if (historyError || !historyData || historyData.length === 0){
+    return (
+      <View className="flex justify-center items-center h-28">
+        <Text className="text-base mb-4 text-dangerColor font-Grotesk">Unable to load {name} chart data</Text>
+        <TouchableOpacity className="bg-title px-5 py-2 rounded-lg" onPress={() => historyRefectch()}>
+          <Text className="text-white text-base font-semibold font-Grotesk">Retry</Text>
+        </TouchableOpacity>
+      </View>
     );
   }
 
@@ -93,7 +87,7 @@ if (historyData?.length >= 2) {
           data={historyData}
           xKey="x"
           yKeys={["y"]}
-          domainPadding={{ top: 10, bottom: 20, left: 20, right: 20 }}
+          domainPadding={{ top: 20, bottom: 20, left: 5, right: 5 }}
           axisOptions={{
             font,
             tickCount: {
@@ -106,16 +100,8 @@ if (historyData?.length >= 2) {
           }}
           chartPressState={state}
         >
-          {({ points, chartBounds }) => (
+          {({ points}) => (
             <>
-            <SkText
-            x={chartBounds.left + 10}
-            y={40}
-            font={font}
-            text={value}
-            color={isPositive ? '#88bca6' : '#df7c90'}
-            style={"fill"}
-             />
               <Line
                 points={points.y}
                 color={isPositive ? '#88bca6' : '#df7c90'}
